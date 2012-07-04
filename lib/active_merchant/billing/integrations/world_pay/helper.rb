@@ -58,7 +58,7 @@ module ActiveMerchant #:nodoc:
           
           # Support for a MD5 hash of selected fields to prevent tampering
           # For futher information read the tech note at the address below: 
-          # http://support.worldpay.com/kb/integration_guides/junior/integration/help/tech_notes/sjig_tn_009.html
+          # http://www.worldpay.com/support/kb/bg/htmlredirect/htmlredirect.html#rhtml5800.html#
           def encrypt(secret, fields = [:amount, :currency, :account, :order])
             signature_fields = fields.collect{ |field| mappings[field] }
             add_field('signatureFields', signature_fields.join(':'))
@@ -69,7 +69,7 @@ module ActiveMerchant #:nodoc:
           end
           
           # Add a time window for which the payment can be completed. Read the link below for how they work
-          # http://support.worldpay.com/kb/integration_guides/junior/integration/help/appendicies/sjig_10100.html
+          # http://www.worldpay.com/support/kb/bg/htmlredirect/htmlredirect.html#rhtml5803.html
           def valid_from(from_time)
             add_field('authValidFrom', from_time.to_i.to_s + '000')
           end
