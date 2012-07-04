@@ -5,13 +5,25 @@ module ActiveMerchant #:nodoc:
   module Billing #:nodoc:
     module Integrations #:nodoc:
       module WorldPay 
-       
-        # production and test have the same endpoint
+
+        # Overwrite this if you want to change the WorldPay test url
+        mattr_accessor :test_url
+        self.test_url = 'https://secure-test.worldpay.com/wcc/purchase'
+
+        # Overwrite this if you want to change the WorldPay production url
         mattr_accessor :production_url
-        self.production_url = 'https://secure.wp3.rbsworldpay.com/wcc/purchase'
-        
+        self.production_url = 'https://secure.worldpay.com/wcc/purchase'
+
         def self.service_url
-          production_url
+          mode = ActiveMerchant::Billing::Base.integration_mode
+          case mode
+          when :production
+            self.production_url
+          when :test
+            self.test_url
+          else
+            raise StandardError, "Integration mode set to an invalid value: #{mode}"
+          end
         end
 
         def self.notification(post, options = {})
