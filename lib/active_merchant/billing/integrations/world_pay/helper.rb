@@ -83,15 +83,21 @@ module ActiveMerchant #:nodoc:
           # M_          : These parameters are passed through to the callback script (if enabled)
           # MC_ or CM_  : These parameters are availble both in the response and callback contexts
           def response_params(params={})
-            params.each{|k,v| add_field("C_#{k}",v)}
+            add_custom_params(params, 'C_')
           end
           
           def callback_params(params={})
-            params.each{|k,v| add_field("M_#{k}",v)}
+            add_custom_params(params, 'M_')
           end
           
           def combined_params(params={})
-            params.each{|k,v| add_field("MC_#{k}",v)}
+            add_custom_params(params, 'MC_')
+          end
+
+          private
+
+          def add_custom_params(params, prefix)
+            params.each{|k,v| add_field("#{prefix}#{k}",v)}
           end
         end
       end
