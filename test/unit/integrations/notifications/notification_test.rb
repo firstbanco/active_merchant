@@ -46,12 +46,10 @@ class NotificationTest < Test::Unit::TestCase
   def test_valid_sender_with_ip_addresses
     ActiveMerchant::Billing::Base.integration_mode = :production
     @notification.production_ips = ['1.2.3.4', '5.6.7.8/24']
-    assert !@notification.valid_sender?(nil)
-    assert !@notification.valid_sender?('localhost')
-    assert !@notification.valid_sender?('1.2.3.0')
-    assert @notification.valid_sender?('1.2.3.4')
-    assert @notification.valid_sender?('5.6.7.8')
-    assert @notification.valid_sender?('5.6.7.255')
+    # -ve tests
+    [nil, 'localhost', '1.2.3.0'].each { |ip| assert !@notification.valid_sender?(ip) }
+    # +ve tests
+    ['1.2.3.4', '5.6.7.8', '5.6.7.255'].each { |ip| assert @notification.valid_sender?(ip) }
     ActiveMerchant::Billing::Base.integration_mode = :test
   end
 
