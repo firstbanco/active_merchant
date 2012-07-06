@@ -94,28 +94,28 @@ module ActiveMerchant #:nodoc:
           #   :not_matched     -  4
           #   :partial_match   -  8
           def cvv_status
-            return avs_value_to_symbol(params['AVS'][0].chr)
+            avs_value_to_symbol(params['AVS'][0].chr)
           end
 
           def postcode_status
-            return avs_value_to_symbol(params['AVS'][1].chr)
+            avs_value_to_symbol(params['AVS'][1].chr)
           end
 
           def address_status
-            return avs_value_to_symbol(params['AVS'][2].chr)
+            avs_value_to_symbol(params['AVS'][2].chr)
           end
 
           def country_status
-            return avs_value_to_symbol(params['AVS'][3].chr)
+            avs_value_to_symbol(params['AVS'][3].chr)
           end
 
           def acknowledge
-            return true
+            true
           end
           
           # WorldPay supports the passing of custom parameters through to the callback script
           def custom_params
-            return @custom_params ||= read_custom_params
+            @custom_params ||= read_custom_params
           end
           
           
