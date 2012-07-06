@@ -3,6 +3,9 @@ module ActiveMerchant #:nodoc:
     module Integrations #:nodoc:
       module WorldPay
         class Notification < ActiveMerchant::Billing::Integrations::Notification
+
+          self.production_ips = ['155.136.16.0/24']
+
           def complete?
             status == 'Completed'
           end 

@@ -64,8 +64,16 @@ class WorldPayNotificationTest < Test::Unit::TestCase
     assert_equal 'Custom Value 2', notification.custom_params[:custom_2]
     assert_equal 'Custom Value 3', notification.custom_params[:custom_3]
   end
-  
-  
+
+  def test_valid_sender_production_ips
+    ActiveMerchant::Billing::Base.integration_mode = :production
+    # -ve tests
+    [nil, '127.0.0.1', '155.136.15.255', '155.136.17.0'].each { |ip| assert !@world_pay.valid_sender?(ip) }
+    # +ve tests
+    ['155.136.16.0', '155.136.16.255'].each { |ip| assert @world_pay.valid_sender?(ip) }
+    ActiveMerchant::Billing::Base.integration_mode = :test
+  end
+
   private
 
   def http_raw_data
