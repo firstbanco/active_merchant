@@ -45,9 +45,11 @@ module ActiveMerchant #:nodoc:
           @raw = ""
         end
 
-        # Check if the request comes from an official IP
-        def valid_sender?(ip)
-          return true if ActiveMerchant::Billing::Base.integration_mode == :test || production_ips.blank?
+        # Check if the request comes from an official IP. Pass an optional hash of options with ignore_test_mode: true
+        # to override test mode, which would otherwise always return true, even if production_ips have been set.
+        def valid_sender?(ip, options = {})
+          test_mode = ActiveMerchant::Billing::Base.integration_mode == :test && !options[:ignore_test_mode]
+          return true if test_mode || production_ips.blank?
           valid_ip_blocks = production_ips.map { |subnet| IPAddr.new subnet }
           valid_ip_blocks.any? { |block| ip != 'localhost' && block.include?(ip) }
         end
