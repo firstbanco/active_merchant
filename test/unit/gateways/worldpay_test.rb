@@ -4,16 +4,16 @@ class WorldpayTest < Test::Unit::TestCase
   include CommStub
 
   def setup
-   @gateway = WorldpayGateway.new(
-      :login => 'testlogin',
-      :password => 'testpassword'
+    @gateway = WorldpayGateway.new(
+        :login => 'testlogin',
+        :password => 'testpassword'
     )
 
     @amount = 100
     @credit_card = credit_card('4242424242424242')
-    @options = {:order_id => 1} 
+    @options = {:order_id => 1}
   end
-  
+
   def test_successful_authorize
     response = stub_comms do
       @gateway.authorize(@amount, @credit_card, @options)
@@ -66,7 +66,7 @@ class WorldpayTest < Test::Unit::TestCase
       @gateway.purchase(@amount, @credit_card, @options)
     end.respond_with(successful_authorize_response)
     assert_success response
-    assert_equal %w(authorize capture), response.responses.collect{|e| e.params["action"]}
+    assert_equal %w(authorize capture), response.responses.collect { |e| e.params["action"] }
   end
 
   def test_capture
@@ -75,6 +75,24 @@ class WorldpayTest < Test::Unit::TestCase
       @gateway.capture(@amount, response.authorization, @options)
     end.respond_with(successful_authorize_response, successful_capture_response)
     assert_success response
+  end
+
+  # More details here - http://www.worldpay.com/support/kb/gg/pdf/payasorder.pdf
+  def test_pay_as_order_with_different_original_order_details
+    original_order_details = {
+        currency: 'USD',
+        original_order_currency: 'EUR',
+        original_order_amount: 100,
+        original_merchant_code: 'ORIGINAL_MC'
+    }
+    @options.merge!(original_order_details)
+    stub_comms do
+      @gateway.authorize(200, '1111', @options)
+    end.check_request do |endpoint, data, headers|
+      assert_match %r(<amount value="200" currencyCode="USD"), data
+      assert_match %r(<payAsOrder orderCode="1111" merchantCode="ORIGINAL_MC"), data
+      assert_match %r(<amount value="100" currencyCode="EUR"), data
+    end.respond_with(successful_authorize_response)
   end
 
   def test_description
@@ -112,8 +130,8 @@ class WorldpayTest < Test::Unit::TestCase
       if data =~ /capture/
         t = Time.now
         assert_tag_with_attributes 'date',
-            {'dayOfMonth' => t.day.to_s, 'month' => t.month.to_s, 'year' => t.year.to_s},
-          data
+                                   {'dayOfMonth' => t.day.to_s, 'month' => t.month.to_s, 'year' => t.year.to_s},
+                                   data
       end
     end.respond_with(successful_inquiry_response, successful_capture_response)
   end
@@ -123,8 +141,8 @@ class WorldpayTest < Test::Unit::TestCase
       @gateway.authorize(100, @credit_card, @options)
     end.check_request do |endpoint, data, headers|
       assert_tag_with_attributes 'amount',
-          {'value' => '100', 'exponent' => '2', 'currencyCode' => 'GBP'},
-        data
+                                 {'value' => '100', 'exponent' => '2', 'currencyCode' => 'GBP'},
+                                 data
     end.respond_with(successful_authorize_response)
   end
 
@@ -179,27 +197,27 @@ class WorldpayTest < Test::Unit::TestCase
     end.respond_with(successful_authorize_response)
 
     assert_equal({
-        "action"=>"authorize",
-        "amount_currency_code"=>"HKD",
-        "amount_debit_credit_indicator"=>"credit",
-        "amount_exponent"=>"2",
-        "amount_value"=>"15000",
-        "avs_result_code_description"=>"UNKNOWN",
-        "balance"=>true,
-        "balance_account_type"=>"IN_PROCESS_AUTHORISED",
-        "card_number"=>"4111********1111",
-        "cvc_result_code_description"=>"UNKNOWN",
-        "last_event"=>"AUTHORISED",
-        "order_status"=>true,
-        "order_status_order_code"=>"R50704213207145707",
-        "payment"=>true,
-        "payment_method"=>"VISA-SSL",
-        "payment_service"=>true,
-        "payment_service_merchant_code"=>"XXXXXXXXXXXXXXX",
-        "payment_service_version"=>"1.4",
-        "reply"=>true,
-        "risk_score_value"=>"1",
-      }, response.params)
+                     "action" => "authorize",
+                     "amount_currency_code" => "HKD",
+                     "amount_debit_credit_indicator" => "credit",
+                     "amount_exponent" => "2",
+                     "amount_value" => "15000",
+                     "avs_result_code_description" => "UNKNOWN",
+                     "balance" => true,
+                     "balance_account_type" => "IN_PROCESS_AUTHORISED",
+                     "card_number" => "4111********1111",
+                     "cvc_result_code_description" => "UNKNOWN",
+                     "last_event" => "AUTHORISED",
+                     "order_status" => true,
+                     "order_status_order_code" => "R50704213207145707",
+                     "payment" => true,
+                     "payment_method" => "VISA-SSL",
+                     "payment_service" => true,
+                     "payment_service_merchant_code" => "XXXXXXXXXXXXXXX",
+                     "payment_service_version" => "1.4",
+                     "reply" => true,
+                     "risk_score_value" => "1",
+                 }, response.params)
   end
 
   def test_auth
@@ -218,7 +236,7 @@ class WorldpayTest < Test::Unit::TestCase
   end
 
   private
-  
+
   def successful_authorize_response
     <<-RESPONSE
 <?xml version="1.0" encoding="UTF-8"?>
@@ -309,7 +327,7 @@ class WorldpayTest < Test::Unit::TestCase
   def sample_authorization_request
     <<-REQUEST
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE paymentService PUBLIC "-//RBS WorldPay//DTD RBS WorldPay PaymentService v1//EN" "http://dtd.wp3.rbsworldpay.com/paymentService_v1.dtd">
+<!DOCTYPE paymentService PUBLIC "-//RBS WorldPay//DTD RBS WorldPay PaymentService v1//EN" "http://dtd.worldpay.com/paymentService_v1.dtd">
 <paymentService merchantCode="XXXXXXXXXXXXXXX" version="1.4">
 <submit>
   <order installationId="0000000000" orderCode="R85213364408111039">

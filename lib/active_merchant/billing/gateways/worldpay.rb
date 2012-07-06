@@ -141,8 +141,12 @@ module ActiveMerchant #:nodoc:
 
       def add_payment_method(xml, amount, payment_method, options)
         if payment_method.is_a?(String)
-          xml.tag! 'payAsOrder', 'orderCode' => payment_method do
-            add_amount(xml, amount, options)
+          attributes = { 'orderCode' => payment_method }
+          attributes['merchantCode'] = options[:original_merchant_code] if options[:original_merchant_code]
+          xml.tag! 'payAsOrder', attributes  do
+            original_order_currency = options[:original_order_currency]
+            amount_options = original_order_currency ? options.merge(currency: original_order_currency) : options
+            add_amount(xml, options[:original_order_amount] || amount, amount_options)
           end
         else
           xml.tag! 'paymentDetails' do
