@@ -1,8 +1,8 @@
 module ActiveMerchant #:nodoc:
   module Billing #:nodoc:
     class WorldpayGateway < Gateway
-      TEST_URL = 'https://secure-test.wp3.rbsworldpay.com/jsp/merchant/xml/paymentService.jsp'
-      LIVE_URL = 'https://secure.wp3.rbsworldpay.com/jsp/merchant/xml/paymentService.jsp'
+      TEST_URL = 'https://secure-test.worldpay.com/jsp/merchant/xml/paymentService.jsp'
+      LIVE_URL = 'https://secure.worldpay.com/jsp/merchant/xml/paymentService.jsp'
 
       self.default_currency = 'GBP'
       self.money_format = :cents
@@ -66,7 +66,7 @@ module ActiveMerchant #:nodoc:
       def build_request
         xml = Builder::XmlMarkup.new :indent => 2
         xml.instruct!
-        xml.declare! :DOCTYPE, :paymentService, :PUBLIC, "-//WorldPay//DTD WorldPay PaymentService v1//EN", "http://dtd.wp3.rbsworldpay.com/paymentService_v1.dtd"
+        xml.declare! :DOCTYPE, :paymentService, :PUBLIC, "-//WorldPay//DTD WorldPay PaymentService v1//EN", "http://dtd.worldpay.com/paymentService_v1.dtd"
         xml.tag! 'paymentService', 'version' => "1.4", 'merchantCode' => @options[:login] do
           yield xml
         end
