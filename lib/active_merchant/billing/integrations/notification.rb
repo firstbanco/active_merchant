@@ -1,4 +1,4 @@
-require 'ipaddr'
+require 'ipaddress'
 
 module ActiveMerchant #:nodoc:
   module Billing #:nodoc:
@@ -50,8 +50,8 @@ module ActiveMerchant #:nodoc:
         def valid_sender?(ip, options = {})
           test_mode = ActiveMerchant::Billing::Base.integration_mode == :test && !options[:ignore_test_mode]
           return true if test_mode || production_ips.blank?
-          valid_ip_blocks = production_ips.map { |subnet| IPAddr.new subnet }
-          valid_ip_blocks.any? { |block| ip != 'localhost' && block.include?(ip) }
+          valid_ip_blocks = production_ips.map { |subnet| IPAddress subnet }
+          valid_ip_blocks.any? { |block| IPAddress.valid?(ip) && block.include?(IPAddress ip) }
         end
 
         private
