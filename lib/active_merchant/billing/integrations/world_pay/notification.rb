@@ -121,15 +121,6 @@ module ActiveMerchant #:nodoc:
           
           private
 
-          # Take the posted data and move the relevant data into a hash
-          def parse(post)
-            @raw = post
-            for line in post.split('&')
-              key, value = *line.scan( %r{^(\w+)\=(.*)$} ).flatten
-              params[key] = value
-            end
-          end
-          
           # Read the custom params into a hash
           def read_custom_params
             custom = {}
